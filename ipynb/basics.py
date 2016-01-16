@@ -186,9 +186,14 @@ sbm_samp.sort_by_unifs().plot()
 sbm_samp.sort_by_degree().plot()
 
 
+# In[13]:
+
+sbm_samp.sort_by_degree().smooth().plot()
+
+
 # Once again, the block structure in the picture of the sample sorted by $U_i$'s is super obvious and matches the original, whereas in the degree sorted sample, there is no visible block structure at all (as opposed to the IRM example).
 
-# In[13]:
+# In[14]:
 
 grad0 = grad.sample(300)
 _= pylab.hist(grad0.graph.sum(0), bins=70, alpha=0.7) 
@@ -212,7 +217,7 @@ pylab.title('Histogram of degrees')
 # 
 # In this example, we first sort by degree and then smooth using a method called universal singular value thresholding (USVT) -- this method basically takes the SVD of the matrix, thresholds the singular values, and returns the resulting matrix with the thresholded singular values.
 
-# In[14]:
+# In[15]:
 
 grad3_sort = grad3.sort_by_degree() # sort by degree
 grad3_sort.plot(title='Sorted sample')
@@ -225,12 +230,18 @@ est.to_graphon_function().plot(title='Function estimator') # aside: can turn the
 grad.plot(title='Gradient graphon')
 
 
+# In[16]:
+
+est = grad3_sort.smooth() # smoothing using USVT, returns a GraphonValueEstimator object
+est.plot()
+
+
 # To compute the mean squared error (MSE), we consider the weighed graph $M_{ij} := W(U_i, U_j)$. The mean squared error is given by:
 # $$\frac{1}{n^2}\sum_{i,j} \left(M_{ij} - \widehat{M}_{ij}\right)^2$$
 # 
 # Here $(\widehat{M}_{ij})$ is the value estimator where the array is ordered according the order the vertices in the graph $(G_{ij})$ were sampled. The first plot below shows the weighted graph $(M_{ij})$ and the second plot shows the graph reordered by the $U_i$'s.
 
-# In[15]:
+# In[17]:
 
 grad3.get_weighted_graph().plot(title='Weighted graph $(M_{ij})$')
 gsorted = grad3.get_weighted_graph().sort_by_unifs()
@@ -242,7 +253,7 @@ gsorted.plot(title='Weighted graph, ordered by $U_i$\'s')
 # 
 # This type of histogram estimator returns a step-function, or function estimate, but from it we can get a value estimator by taking the points in the function that correspond to the sampled graph.
 
-# In[16]:
+# In[18]:
 
 #irm3.plot()
 samp = irm3_samp
@@ -274,9 +285,124 @@ hist3.plot(title='50 bins, MSE: %.4f' % mse3)
 
 
 
+# In[19]:
+
+from pygraphon.core.graphons import SBM
+sbm = Graphon(SBM(0.3, 0.8, 0.3))
+sbm.plot()
+
+sbm_samp = sbm.sample(300)
+sbm_samp.plot()
+sbm_samp.sort_by_unifs().plot()
+sbm_samp.sort_by_degree().plot()
+
+sbm_sorted = sbm_samp.sort_by_degree()
+
+hist0 = sbm_sorted.hist(2)
+mse0 = hist0.compute_MSE(sbm_samp.get_weighted_graph(), sbm_sorted.permutation)
+hist0.plot()#title=2 bins, MSE: %.4f' % mse0)
+
+hist1 = sbm_sorted.hist(3)
+mse1 = hist1.compute_MSE(sbm_samp.get_weighted_graph(), sbm_sorted.permutation)
+hist1.plot()#title='4 bins, MSE: %.4f' % mse1)
+
+hist2 = sbm_sorted.hist(4)
+mse2 = hist2.compute_MSE(sbm_samp.get_weighted_graph(), sbm_sorted.permutation)
+hist2.plot()#title='5 bins, MSE: %.4f' % mse2)
+
+hist3 = sbm_sorted.hist(5)
+mse3 = hist3.compute_MSE(sbm_samp.get_weighted_graph(), sbm_sorted.permutation)
+hist3.plot()#title='5 bins, MSE: %.4f' % mse3)
+
+
+# In[20]:
+
+sbm_samp.sort_by_degree().smooth().plot()
+
+
+# In[21]:
+
+tri_sort = sbm_samp.sort_by_triangle()
+tri_sort.plot()
+
+
 # In[ ]:
 
 
+
+
+# In[22]:
+
+tri_sort.smooth().plot()
+
+
+# In[23]:
+
+sbm = Graphon(SBM(0.3, 0.8, 0.5))
+sbm.plot()
+sbm_samp = sbm.sample(300)
+sbm_samp.plot()
+sbm_samp.sort_by_unifs().plot()
+sbm_samp.sort_by_degree().plot()
+sbm_samp.sort_by_triangle().plot()
+sbm_samp.sort_by_gray().plot()
+
+
+# In[24]:
+
+sbm_samp.sort_by_degree().smooth().plot()
+sbm_samp.sort_by_triangle().smooth().plot()
+
+
+# In[ ]:
+
+
+
+
+# In[25]:
+
+grad_samp = grad.sample(200)
+
+
+# In[26]:
+
+grad_samp.sort_by_degree().smooth().plot()
+grad_samp.sort_by_triangle().smooth().plot()
+
+
+# In[27]:
+
+grad_samp.sort_by_unifs().plot()
+grad_samp.sort_by_degree().plot()
+grad_samp.sort_by_triangle().plot()
+
+
+# In[28]:
+
+# graphon
+irm1.plot()
+
+irm2_samp = irm1.sample(100)
+# sample sorted by unifs
+irm2_samp.sort_by_unifs().plot()
+# sample sorted by degree
+irm_deg = irm2_samp.sort_by_degree()
+irm_deg.plot()
+#irm_deg.smooth().plot()
+
+irm_tri = irm2_samp.sort_by_triangle()
+irm_tri.plot()
+#irm_tri.smooth().plot()
+
+
+# In[29]:
+
+irm2_samp.sort_by_gray().plot()
+
+
+# In[30]:
+
+irm2_samp.sort_by_gray().hist(8).plot()
 
 
 # In[ ]:
