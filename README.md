@@ -100,7 +100,7 @@ sample = ER.sample(100)
 ER.plot()
 sample.plot()
 
-sample_step = sample.to_stepfunction()
+sample_step = sample.to_step_function()
 sample_step.plot()
 sample2 = sample_step.sample(100)
 sample2.plot()
