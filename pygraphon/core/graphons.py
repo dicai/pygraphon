@@ -73,7 +73,7 @@ def IRM_symmetric(alpha=1, a=1, b=1, T=2000, seed=1001):
     from pygraphon.utils.stats import DP_stick
 
     np.random.seed(seed)
-    dpwts = DP_stick(alpha, T)
+    dpwts = np.sort(DP_stick(alpha, T))[::-1]
     num_row_clust = len(dpwts)
 
     triangle = [[np.random.beta(a, b) for i in xrange(j+1)] for j in xrange(num_row_clust)]
