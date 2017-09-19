@@ -63,14 +63,17 @@ class GraphonFunctionEstimator(Graphon):
         value = discretize(self.graphon, n)
         return GraphonValueEstimator(value, self.graph_obj)
 
-    def compute_MSE(self, weighted, permutation):
+    def compute_MSE(self, weighted, permutation, l2=True):
         """
         weighted: a WeightedGraph containing
         """
         value_est = self.to_graphon_value().value_est
         n = weighted.shape[0]
         weighted_new = weighted.permute(permutation).graph
-        return ((value_est - weighted_new) ** 2).sum() / float(n**2)
+        if l2:
+            return ((value_est - weighted_new) ** 2).sum() / float(n**2)
+        else:
+            return np.abs(value_est - weighted_new).sum() / float(n**2)
 
 class GraphonValueEstimator(object):
     def __init__(self, value_est, graph_obj):
@@ -111,6 +114,25 @@ class GraphonValueEstimator(object):
     def __repr__(self):
         print('GraphonValueEstimator: \n' + str(self.value_est))
 
+# Partition for graphon
+class Partition(object):
+    def __init__(self, partition):
+        """
+        partition: dictionary, where each key is the "centroid" of the cluster
+        """
+        self.partition = partition
+        self.K = len(partition.keys())
+        self.centroids = partition.keys()
+
+    def reorder_graph(self, graph):
+        """
+        graph: type???
+        """
+        # reorder graph according to the partiti
+        pass
+
+    def to_graphon_estimator(self):
+        pass
 
 ###############################################################################
 # Digraphons
@@ -268,6 +290,10 @@ class Graph(object):
         ## TODO: implement for permuted graph
         return Graph(np.array(sorted(self.graph, cmp=order_unlabel)))
 
+    def sort_by_ordering(self, ordering):
+        graph = sort_graph_given_order(self.graph, ordering)
+        return PermutedGraph(graph, forward, reverse)
+
     def smooth(self, graph=None, type='usvt'):
         from pygraphon.utils.stats import usvt
 
@@ -307,7 +333,7 @@ class RandomGraph(Graph):
     graphon_obj: Graphon object from which this RandomGraph instance was generated
     """
 
-    def __init__(self, graph, unifs, seed, graphon_obj):
+    def __init__(self, graph, unifs, seed, graphon_obj, wts=None):
         super(RandomGraph, self).__init__(graph)
 
         self.unifs = unifs
